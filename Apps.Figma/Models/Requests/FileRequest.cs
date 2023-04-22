@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apps.Zendesk.Models.Requests
+namespace Apps.Figma.Models.Requests
 {
     public class FileRequest
     {
