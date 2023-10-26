@@ -10,7 +10,7 @@ public class ConnectionValidator : IConnectionValidator
         IEnumerable<AuthenticationCredentialsProvider> authProviders, CancellationToken cancellationToken)
     {
         var client = new FigmaClient();
-        var request = new FigmaRequest($"/v1/me", Method.Get, authProviders);
+        var request = new FigmaRequest("/v1/me", Method.Get, authProviders);
 
         try
         {
