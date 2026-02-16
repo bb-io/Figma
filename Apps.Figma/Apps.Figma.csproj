@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Product>Figma</Product>
-        <Description>Description</Description>
+        <Description>Design and collaboration platform that specializes in UI and UX design</Description>
         <Version>1.0.0</Version>
         <AssemblyName>Apps.Figma</AssemblyName>
     </PropertyGroup>
