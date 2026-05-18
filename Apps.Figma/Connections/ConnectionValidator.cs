@@ -24,8 +24,7 @@ public class ConnectionValidator(InvocationContext invocationContext) : BaseInvo
             var request = new RestRequest($"/v1/projects/{projectId}/files");
 
             var response = await client.ExecuteAsync(request, cancellationToken);
-
-            var isValid = response.StatusCode != System.Net.HttpStatusCode.Forbidden;
+            var isValid = response.StatusCode != System.Net.HttpStatusCode.Forbidden && response.StatusCode != System.Net.HttpStatusCode.NotFound;
 
             return new ConnectionValidationResponse
             {
