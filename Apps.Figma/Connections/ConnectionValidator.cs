@@ -8,6 +8,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Sdk;
 using Newtonsoft.Json;
 using RestSharp;
+using System.Net;
 
 namespace Apps.Figma.Connections;
 
@@ -24,7 +25,10 @@ public class ConnectionValidator(InvocationContext invocationContext) : BaseInvo
             var request = new RestRequest($"/v1/projects/{projectId}/files");
 
             var response = await client.ExecuteAsync(request, cancellationToken);
-            var isValid = response.StatusCode != System.Net.HttpStatusCode.Forbidden && response.StatusCode != System.Net.HttpStatusCode.NotFound;
+            var isValid = 
+                response.StatusCode != HttpStatusCode.Forbidden && 
+                response.StatusCode != HttpStatusCode.NotFound &&
+                response.StatusCode != HttpStatusCode.Unauthorized;
 
             return new ConnectionValidationResponse
             {
