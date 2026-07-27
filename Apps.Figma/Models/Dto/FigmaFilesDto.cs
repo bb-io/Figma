@@ -9,3 +9,8 @@ public class FigmaFileDto
     public string Key { get; set; }
     public string Name { get; set; }
 }
+
+public class FigmaFileMetaDto
+{
+    public FigmaFileDto File { get; set; }
+}

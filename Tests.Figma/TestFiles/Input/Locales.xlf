@@ -1,0 +1,59 @@
+<xliff srcLang="en-us" trgLang="nl-nl" version="2.2" xmlns:mda="urn:oasis:names:tc:xliff:metadata:2.0" xmlns="urn:oasis:names:tc:xliff:document:2.2">
+  <file id="f1">
+    <mda:metadata>
+      <mda:metaGroup category="blackbird">
+        <mda:meta type="original-name">Locales</mda:meta>
+        <mda:meta type="source-ucid">KazRrZ8qMRapzOJZ08J7FP|VariableCollectionId:1122:208</mda:meta>
+        <mda:meta type="source-content-name">Variables - Locales</mda:meta>
+        <mda:meta type="source-admin-url">https://www.figma.com/design/KazRrZ8qMRapzOJZ08J7FP?view=variables</mda:meta>
+        <mda:meta type="source-system-name">Figma</mda:meta>
+        <mda:meta type="source-system-ref">https://www.figma.com</mda:meta>
+      </mda:metaGroup>
+    </mda:metadata>
+    <unit id="u1" name="VariableID:1122:209">
+      <mda:metadata>
+        <mda:meta type="Figma name">title</mda:meta>
+        <mda:metaGroup category="blackbird">
+          <mda:meta type="key">title</mda:meta>
+        </mda:metaGroup>
+      </mda:metadata>
+      <notes>
+        <note>The title of the main page</note>
+      </notes>
+      <segment state="translated">
+        <source>Variables</source>
+        <target>Variabelen!</target>
+      </segment>
+    </unit>
+    <unit id="u2" name="VariableID:1122:211">
+      <mda:metadata>
+        <mda:meta type="Figma name">product</mda:meta>
+        <mda:metaGroup category="blackbird">
+          <mda:meta type="key">product</mda:meta>
+        </mda:metaGroup>
+      </mda:metadata>
+      <notes>
+        <note>The subtitle of the main page</note>
+      </notes>
+      <segment state="translated">
+        <source>Product</source>
+        <target>Product! TRANSLATED</target>
+      </segment>
+    </unit>
+    <unit id="u3" name="VariableID:1131:31">
+      <mda:metadata>
+        <mda:meta type="Figma name">empty</mda:meta>
+        <mda:metaGroup category="blackbird">
+          <mda:meta type="key">empty</mda:meta>
+        </mda:metaGroup>
+      </mda:metadata>
+      <notes>
+        <note></note>
+      </notes>
+      <segment state="translated">
+        <source>empty</source>
+        <target>leeg!</target>
+      </segment>
+    </unit>
+  </file>
+</xliff>
