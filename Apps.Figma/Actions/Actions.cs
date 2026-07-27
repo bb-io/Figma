@@ -130,7 +130,7 @@ public class Actions(InvocationContext invocationContext, IFileManagementClient 
             var targetString = (string?)targetVariable ?? string.Empty;
 
             segment.Source = coder.DeserializeSegment(sourceString);
-            segment.Target = coder.DeserializeSegment(targetString);
+            //segment.Target = coder.DeserializeSegment(targetString);
 
             segment.State = SegmentState.Initial;
 
