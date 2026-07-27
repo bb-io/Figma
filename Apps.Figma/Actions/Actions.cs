@@ -88,12 +88,6 @@ public class Actions(InvocationContext invocationContext, IFileManagementClient 
         return response.Meta;
     }
 
-    private bool IsEmptyOrDefault(string variable)
-    {
-        if (variable == "String value") return true;
-        return string.IsNullOrEmpty(variable);
-    }
-
     [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
     [Action("Download variables", Description = "Download the variables of a Figma file")]
     public async Task<FileResponse> DownloadVariables([ActionParameter] FileKeyRequest keyRequest, [ActionParameter] VariableDownloadRequest variableRequest)
@@ -138,7 +132,7 @@ public class Actions(InvocationContext invocationContext, IFileManagementClient 
             segment.Source = coder.DeserializeSegment(sourceString);
             segment.Target = coder.DeserializeSegment(targetString);
 
-            segment.State = IsEmptyOrDefault(targetString) ? SegmentState.Initial : SegmentState.Translated;
+            segment.State = SegmentState.Initial;
 
             var unit = new Unit(coder);
             unit.Segments.Add(segment);

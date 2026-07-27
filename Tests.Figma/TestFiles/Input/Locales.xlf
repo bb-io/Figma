@@ -37,7 +37,7 @@
       </notes>
       <segment state="translated">
         <source>Product</source>
-        <target>Product! TRANSLATED</target>
+        <target>Product! TRANSLATED OK!>?</target>
       </segment>
     </unit>
     <unit id="u3" name="VariableID:1131:31">
