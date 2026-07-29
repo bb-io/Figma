@@ -1,8 +1,8 @@
 {
-  "title": "Variabelen!!!",
-  "product": "Product! TRANSLATED OK!!>?",
-  "homepage-empty": "leeg!!!",
-  "new-variable":  "Deze is nieuw!",
+  "title": "Variabelen",
+  "product": "Product",
+  "homepage-empty": "leeg",
+  "new-variable":  "Deze is nieuw",
   "__blackbird_meta": {
     "variant": "nl-nl",
     "system": {

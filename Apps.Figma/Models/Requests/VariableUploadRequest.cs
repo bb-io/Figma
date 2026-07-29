@@ -19,5 +19,5 @@ public class VariableUploadRequest : IUploadContentInput
 
     [Display("Target mode", Description = "The mode to upload the variables to")]
     [DataSource(typeof(VariableModeHandler))]
-    public string Locale { get; set; }
+    public string? Locale { get; set; }
 }

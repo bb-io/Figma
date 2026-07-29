@@ -104,17 +104,6 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
         if (string.IsNullOrEmpty(variableRequest.CollectionId)) throw new PluginMisconfigurationException("The collection ID input is null or empty.");
 
-        var fileInfo = await GetFileInfo(variableRequest.ContentId);
-        var variablesMeta = await GetFileVariables(variableRequest.ContentId);
-        
-        if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'");
-        
-        // TODO should be created if it doesn't exist?
-        var mode = collection.Modes.FirstOrDefault(x => x.Name == variableRequest.Locale) ?? throw new PluginMisconfigurationException($"Cannot find mode with name '{variableRequest.Locale}'");
-
-        var currentVariables = variablesMeta.Variables.Values
-            .Where(x => x.VariableCollectionId == collection.Id);
-
         var file = await fileManagementClient.DownloadAsync(variableRequest.Content);
         var transformationResult = Transformation.Load(file, variableRequest.Content.Name, variableRequest.Content.ContentType);
         var contentResult = transformationResult.Target();
@@ -123,6 +112,33 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
             InvocationContext.Logger?.LogError($"Not a Blackbird interoperable file: {contentResult.Error}", []);
             throw new PluginMisconfigurationException("The file could not be parsed properly, did Blackbird not create this file? See Action logs for more details");
         }
+
+        var fileInfo = await GetFileInfo(variableRequest.ContentId);
+        var variablesMeta = await GetFileVariables(variableRequest.ContentId);
+
+        var locale = variableRequest.Locale ?? contentResult.Value.Language;
+
+        if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'"); 
+        var mode = collection.Modes.FirstOrDefault(x => x.Name == locale);
+
+        CreateModeDto? variableModeChange = null;
+        if (mode is null)
+        {
+            variableModeChange = new CreateModeDto()
+            {
+                Id = "temp-mode",
+                Name = locale,
+                VariableCollectionId = collection.Id,
+            };
+            mode = new Mode()
+            {
+                ModeId = "temp-mode",
+                Name = locale,
+            };
+        }
+
+        var currentVariables = variablesMeta.Variables.Values
+            .Where(x => x.VariableCollectionId == collection.Id);        
 
         var variableModeValues = new List<VariableModeValueDto>();
         var variablesToBeCreated = new List<CreateVariableDto>();
@@ -167,6 +183,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
             {
                 VariableModeValues = variableModeValues,
                 Variables = variablesToBeCreated,
+                VariableModes = variableModeChange is null ? [] : new List<CreateModeDto>() { variableModeChange }
             });
             await Client.ExecuteWithErrorHandling(request);
         }

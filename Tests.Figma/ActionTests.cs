@@ -59,10 +59,7 @@ public class ActionTests : TestBase
         var actions = new VariableActions(InvocationContext, new FileManager());
         var key = "KazRrZ8qMRapzOJZ08J7FP";
         var collectionId = "VariableCollectionId:1122:208";
-        var targetMode = "nl-nl";
-
-        var downloadResponse = await actions.DownloadVariables(new FileKeyRequest { ContentId = key }, new VariableDownloadRequest { CollectionId = collectionId, ModeName = targetMode });
-        Assert.IsNotNull(downloadResponse.Content);        
+        var targetMode = "nl-be";     
 
         var response = await actions.UploadVariables(new VariableUploadRequest
         {
@@ -72,7 +69,7 @@ public class ActionTests : TestBase
                 ContentType = MediaTypeNames.Application.Json,
             },
             CollectionId = collectionId,
-            Locale = targetMode,
+            //Locale = targetMode,
             ContentId = key
         });
 
