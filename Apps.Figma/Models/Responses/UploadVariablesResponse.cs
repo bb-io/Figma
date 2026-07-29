@@ -10,4 +10,7 @@ public class UploadVariablesResponse : IDownloadContentOutput
 
     [Display("Updated variables", Description = "The number of variables updated")]
     public int NumberOfUpdatedVariables { get; set; } = 0;
+
+    [Display("New variables", Description = "The number of newly created variables")]
+    public int NumberOfNewVariables { get; set; } = 0;
 }

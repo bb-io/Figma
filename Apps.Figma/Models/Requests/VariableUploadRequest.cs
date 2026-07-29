@@ -17,7 +17,7 @@ public class VariableUploadRequest : IUploadContentInput
     [DataSource(typeof(VariableCollectionHandler))]
     public string CollectionId { get; set; }
 
-    [Display("Target language", Description = "The mode to upload the target variables to")]
+    [Display("Target mode", Description = "The mode to upload the variables to")]
     [DataSource(typeof(VariableModeHandler))]
     public string Locale { get; set; }
 }

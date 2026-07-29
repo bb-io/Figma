@@ -1,0 +1,221 @@
+﻿using Apps.Figma.Models.Dto;
+using Apps.Figma.Models.Requests;
+using Apps.Figma.Models.Responses;
+using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Exceptions;
+using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.SDK.Blueprints;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Blackbird.Filters.Coders;
+using Blackbird.Filters.Constants;
+using Blackbird.Filters.Enums;
+using Blackbird.Filters.Extensions;
+using Blackbird.Filters.Shared;
+using Blackbird.Filters.Transformations;
+using Newtonsoft.Json;
+using RestSharp;
+using System.Net.Mime;
+using System.Xml.Linq;
+
+namespace Apps.Figma.Actions;
+[ActionList("Variables")]
+public class VariableActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : Invocable(invocationContext)
+{
+    private async Task<FigmaFileDto> GetFileInfo(string key)
+    {
+        var request = new RestRequest($"/v1/files/{key}/meta", Method.Get);
+        var response = await Client.ExecuteWithErrorHandling<FigmaFileMetaDto>(request);
+        if (response.File is null) throw new PluginMisconfigurationException($"Cannot find Figma file with key {key}");
+        return response.File;
+    }
+
+    private async Task<Models.Dto.Meta> GetFileVariables(string key)
+    {
+        var request = new RestRequest($"/v1/files/{key}/variables/local", Method.Get);
+        var response = await Client.ExecuteWithErrorHandling<VariablesResponseDto>(request);
+        return response.Meta;
+    }
+
+    private string? GetVariableAsString(Variable variable, Mode mode)
+    {
+        variable.ValuesByMode.TryGetValue(mode.ModeId, out var valueByNode);
+        if (valueByNode is not string && valueByNode is not null) return null;
+        return (string?) valueByNode;
+    }
+
+    [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
+    [Action("Download variables", Description = "Download the variables of a Figma file")]
+    public async Task<FileResponse> DownloadVariables([ActionParameter] FileKeyRequest keyRequest, [ActionParameter] VariableDownloadRequest variableRequest)
+    {
+        if (string.IsNullOrEmpty(keyRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
+        if (string.IsNullOrEmpty(variableRequest.CollectionId)) throw new PluginMisconfigurationException("The collection ID input is null or empty.");
+        if (string.IsNullOrEmpty(variableRequest.ModeName)) throw new PluginMisconfigurationException("The mode input is null or empty.");
+
+        var fileInfo = await GetFileInfo(keyRequest.ContentId);
+        var variablesMeta = await GetFileVariables(keyRequest.ContentId);
+
+        if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'");
+        var mode = collection.Modes.FirstOrDefault(x => x.Name == variableRequest.ModeName) ?? throw new PluginMisconfigurationException($"Cannot find mode with name '{variableRequest.ModeName}'");
+
+        var variables = variablesMeta.Variables.Values
+            .Where(x => x.VariableCollectionId == collection.Id && GetVariableAsString(x, mode) is not null)
+            .ToDictionary(x => x.Name, x => GetVariableAsString(x, mode));
+        var serialized = JsonConvert.SerializeObject(variables, Formatting.Indented);
+        var jsonCoder = new JsonCoder();
+
+        var contentName = $"{fileInfo.Name} - {collection.Name}";
+        var fileName = contentName + ".json";
+        var codedContent = jsonCoder.Deserialize(serialized, fileName);
+        codedContent.Language = mode.Name;
+        codedContent.OriginalName = contentName;
+        codedContent.SystemReference = new SystemReference
+        {
+            ContentId = $"{keyRequest.ContentId}|{collection.Id}",
+            ContentName = $"{fileInfo.Name} - {collection.Name}",
+            AdminUrl = $"https://www.figma.com/design/{keyRequest.ContentId}?view=variables",
+            SystemName = "Figma",
+            SystemRef = "https://www.figma.com"
+        };
+        // TODO codedContent.Provenance = 
+
+        return new FileResponse
+        {
+            Content = await fileManagementClient.UploadAsync(jsonCoder.ToStream(codedContent), MediaTypeNames.Application.Json, fileName),
+        };
+    }
+
+    private static string SanitizeCharacters(string input)
+    {
+        if (input == null)
+            return input;
+
+        return input
+            .Replace('{', '[')
+            .Replace('}', ']')
+            .Replace('$', '%')
+            .Replace('.', '-');
+    }
+
+    [BlueprintActionDefinition(BlueprintAction.UploadContent)]
+    [Action("Upload variables", Description = "Upload translated variables back to a Figma file")]
+    public async Task<UploadVariablesResponse> UploadVariables([ActionParameter] VariableUploadRequest variableRequest)
+    {
+        if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
+        if (string.IsNullOrEmpty(variableRequest.CollectionId)) throw new PluginMisconfigurationException("The collection ID input is null or empty.");
+
+        var fileInfo = await GetFileInfo(variableRequest.ContentId);
+        var variablesMeta = await GetFileVariables(variableRequest.ContentId);
+        
+        if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'");
+        
+        // TODO should be created if it doesn't exist?
+        var mode = collection.Modes.FirstOrDefault(x => x.Name == variableRequest.Locale) ?? throw new PluginMisconfigurationException($"Cannot find mode with name '{variableRequest.Locale}'");
+
+        var currentVariables = variablesMeta.Variables.Values
+            .Where(x => x.VariableCollectionId == collection.Id);
+
+        var file = await fileManagementClient.DownloadAsync(variableRequest.Content);
+        var transformationResult = Transformation.Load(file, variableRequest.Content.Name, variableRequest.Content.ContentType);
+        var contentResult = transformationResult.Target();
+        if (!contentResult.Success)
+        {
+            InvocationContext.Logger?.LogError($"Not a Blackbird interoperable file: {contentResult.Error}", []);
+            throw new PluginMisconfigurationException("The file could not be parsed properly, did Blackbird not create this file? See Action logs for more details");
+        }
+
+        var variableModeValues = new List<VariableModeValueDto>();
+        var variablesToBeCreated = new List<CreateVariableDto>();
+
+        foreach (var unit in contentResult.Value.TextUnits)
+        {
+            var text = unit.GetCodedText();
+            if (string.IsNullOrEmpty(text)) continue;
+            if (unit.Key is null) continue;
+
+            var name = SanitizeCharacters(unit.Key);
+            var currentVariable = currentVariables.FirstOrDefault(x => x.Name == name);
+            var currentVariableId = currentVariable?.Id;
+
+            if (currentVariable is null)
+            {
+                currentVariableId = $"temp-" + variableModeValues.Count;
+                variablesToBeCreated.Add(new CreateVariableDto
+                {
+                    Id = currentVariableId,
+                    Name = name,
+                    VariableCollectionId = collection.Id,
+                });
+            } else
+            {
+                var currentText = GetVariableAsString(currentVariable, mode);
+                if (currentText == text) continue;
+            }
+
+            variableModeValues.Add(new VariableModeValueDto
+            {
+                VariableId = currentVariableId!,
+                ModeId = mode.ModeId,
+                Value = text,
+            });
+        }
+
+        if (variableModeValues.Count > 0)
+        {
+            var request = new RestRequest($"/v1/files/{variableRequest.ContentId}/variables", Method.Post);
+            request.AddJsonBody(new
+            {
+                VariableModeValues = variableModeValues,
+                Variables = variablesToBeCreated,
+            });
+            await Client.ExecuteWithErrorHandling(request);
+        }
+
+        var transformation = transformationResult.Value!;
+
+        transformation.TargetSystemReference = new SystemReference
+        {
+            ContentId = $"{variableRequest.ContentId}|{collection.Id}",
+            ContentName = $"{fileInfo.Name} - {collection.Name}",
+            AdminUrl = $"https://www.figma.com/design/{variableRequest.ContentId}?view=variables",
+            SystemName = "Figma",
+            SystemRef = "https://www.figma.com"
+        };
+        transformation.TargetLanguage = mode.Name;
+
+        var output = new UploadVariablesResponse
+        {
+            NumberOfUpdatedVariables = variableModeValues.Count,
+            NumberOfNewVariables = variablesToBeCreated.Count
+        };
+
+        if (transformationResult.WasBilingual)
+        {
+            output.Content = await fileManagementClient.UploadAsync(
+                transformation.ToStream(),
+                MediaTypes.Xliff2,
+                transformation.BilingualFileName);
+        }
+        else
+        {
+            var targetResult = transformation.Target();
+            if (!targetResult.Success)
+            {
+                output.Content = variableRequest.Content;
+                InvocationContext.Logger?.LogError($"Failed to load target file: {targetResult.Error}", []);
+            }
+            else
+            {
+                var target = targetResult.Value;
+                target.SystemReference = transformation.TargetSystemReference;
+
+                output.Content = await fileManagementClient.UploadAsync(
+                    target.ToStream(),
+                    target.OriginalMediaType,
+                    target.OriginalName);
+            }
+        }
+
+        return output;
+    }
+}

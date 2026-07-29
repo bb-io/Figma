@@ -29,7 +29,7 @@ public class VariableModeHandler : Invocable, IAsyncDataSourceItemHandler
         if (!response.Meta.VariableCollections.TryGetValue(_collectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{_collectionId}'");
 
        
-        var items = collection.Modes.Select(x => new DataSourceItem(x.ModeId, x.Name)) ?? [];
+        var items = collection.Modes.Select(x => new DataSourceItem(x.Name, x.Name)) ?? [];
         if (!string.IsNullOrWhiteSpace(context.SearchString))
             return items.Where(x => x.DisplayName.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase));
 
