@@ -6,22 +6,23 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
 
 namespace Apps.Figma.Actions;
 
-[ActionList]
-public class Actions(InvocationContext invocationContext) : Invocable(invocationContext)
+[ActionList("Images")]
+public class ImageActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : Invocable(invocationContext)
 {
-    [Action("Download image", Description = "Download an image from a Figma file")]
+    [Action("Download image", Description = "Download an image from a Figma project")]
     public async Task<ImageResponse> DownloadImage(
         [ActionParameter] FileKeyRequest keyRequest, 
         [ActionParameter] FileNodeRequest nodeRequest, 
         [ActionParameter] ImageDownloadOptions options
         )
     {
-        if (string.IsNullOrEmpty(keyRequest.Key)) throw new PluginMisconfigurationException("The key input is null or empty.");
+        if (string.IsNullOrEmpty(keyRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
         if (string.IsNullOrEmpty(nodeRequest.NodeId)) throw new PluginMisconfigurationException("The node ID input is null or empty.");
 
         var mediaTypes = new Dictionary<string, string>()
@@ -37,7 +38,7 @@ public class Actions(InvocationContext invocationContext) : Invocable(invocation
             throw new PluginMisconfigurationException($"{options.Format} is an unsupported format.");
         }
 
-        var request = new RestRequest($"/v1/images/{keyRequest.Key}", Method.Get);
+        var request = new RestRequest($"/v1/images/{keyRequest.ContentId}", Method.Get);
         request.AddQueryParameter("ids", nodeRequest.NodeId);
         if (options.Format is not null)
         {
@@ -62,4 +63,6 @@ public class Actions(InvocationContext invocationContext) : Invocable(invocation
             File = new FileReference(new HttpRequestMessage(HttpMethod.Get, image.Value), $"{imageName}.{extension}", mediaTypes[extension]),
         };
     }
+
+   
 }

@@ -26,7 +26,7 @@ public class Client : BlackBirdRestClient
             var error = JsonConvert.DeserializeObject<ErrorDto>(response.Content);
             if (error != null)
             {
-                return error.Message;
+                return error.Err ?? error.Message ?? error.Error;
             }            
         }
 

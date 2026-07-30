@@ -7,5 +7,11 @@ public class ErrorDto
     public int Status { get; set; }
 
     [JsonProperty("err")]
+    public string Err { get; set; }
+
+    [JsonProperty("error")]
+    public string Error { get; set; }
+
+    [JsonProperty("message")]
     public string Message { get; set; }
 }

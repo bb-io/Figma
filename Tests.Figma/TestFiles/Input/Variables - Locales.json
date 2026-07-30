@@ -1,0 +1,20 @@
+{
+  "title": "Variabelen",
+  "product": "Product",
+  "homepage-empty": "leeg",
+  "new-variable":  "Deze is nieuw",
+  "__blackbird_meta": {
+    "variant": "nl-nl",
+    "system": {
+      "ucid": "KazRrZ8qMRapzOJZ08J7FP|VariableCollectionId:1122:208",
+      "content-name": "Variables - Locales",
+      "admin-url": "https://www.figma.com/design/KazRrZ8qMRapzOJZ08J7FP?view=variables",
+      "system-name": "Figma",
+      "system-ref": "https://www.figma.com"
+    },
+    "provenance": {
+      "translation": {},
+      "revision": {}
+    }
+  }
+}

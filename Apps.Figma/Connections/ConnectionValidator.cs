@@ -1,12 +1,10 @@
 using Apps.Figma.Api;
 using Apps.Figma.Constants;
-using Apps.Figma.Models;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Sdk;
-using Newtonsoft.Json;
 using RestSharp;
 using System.Net;
 
