@@ -32,7 +32,7 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
 
     [BlueprintEventDefinition(BlueprintEvent.ContentCreatedOrUpdatedMultiple)]
     [PollingEvent("On variables updated",
-       Description = "Triggered on an interval and outputs the variables of the mode updated.")]
+       Description = "Triggers when variables in a mode are updated.")]
     public async Task<PollingEventResponse<VariablesPollingMemory, VariablePollingResponse>> OnVariablesUpdated(
        PollingEventRequest<VariablesPollingMemory> request,
        [PollingEventParameter] VariablePollingFilters filter)

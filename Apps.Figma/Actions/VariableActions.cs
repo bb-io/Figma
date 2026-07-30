@@ -28,7 +28,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
     }    
 
     [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
-    [Action("Download variables", Description = "Download the variables of a Figma file")]
+    [Action("Download variables", Description = "Download variables from a Figma project")]
     public async Task<FileResponse> DownloadVariables([ActionParameter] VariableDownloadRequest variableRequest)
     {
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
@@ -82,7 +82,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
     }
 
     [BlueprintActionDefinition(BlueprintAction.UploadContent)]
-    [Action("Upload variables", Description = "Upload translated variables back to a Figma file")]
+    [Action("Upload variables", Description = "Upload translated variables to a Figma project")]
     public async Task<UploadVariablesResponse> UploadVariables([ActionParameter] VariableUploadRequest variableRequest)
     {
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");

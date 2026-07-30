@@ -15,7 +15,7 @@ namespace Apps.Figma.Actions;
 [ActionList("Images")]
 public class ImageActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : Invocable(invocationContext)
 {
-    [Action("Download image", Description = "Download an image from a Figma file")]
+    [Action("Download image", Description = "Download an image from a Figma project")]
     public async Task<ImageResponse> DownloadImage(
         [ActionParameter] FileKeyRequest keyRequest, 
         [ActionParameter] FileNodeRequest nodeRequest, 
