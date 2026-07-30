@@ -1,10 +1,9 @@
 ﻿using Apps.Figma.Handlers;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
-using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 
-namespace Apps.Figma.Models.Requests;
-public class VariableDownloadRequest : IDownloadContentInput
+namespace Apps.Figma.Models.Polling;
+public class VariablePollingFilters
 {
     [Display("File key", Description = "The key of the figma file. Can be found in the URL: https://www.figma.com/:file_type/:file_key/..."), DataSource(typeof(FileKeyHandler))]
     public string ContentId { get; set; }
@@ -13,7 +12,7 @@ public class VariableDownloadRequest : IDownloadContentInput
     [DataSource(typeof(VariableCollectionHandler))]
     public string CollectionId { get; set; }
 
-    [Display("Mode", Description = "The mode to download")]
+    [Display("Modes", Description = "The modes to consider. By default all modes are polled.")]
     [DataSource(typeof(VariableModeHandler))]
-    public string ModeName { get; set; }
+    public IEnumerable<string>? ModeNames { get; set; }
 }

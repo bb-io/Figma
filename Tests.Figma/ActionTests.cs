@@ -37,7 +37,7 @@ public class ActionTests : TestBase
         var actions = new VariableActions(InvocationContext, new FileManager());
         var key = "KazRrZ8qMRapzOJZ08J7FP";
 
-        var response = await actions.DownloadVariables(new FileKeyRequest { ContentId = key }, new VariableDownloadRequest { CollectionId = "VariableCollectionId:1122:208", ModeName = "en-us" });
+        var response = await actions.DownloadVariables(new VariableDownloadRequest { ContentId = key, CollectionId = "VariableCollectionId:1122:208", ModeName = "en-us" });
         Assert.IsNotNull(response.Content);
 
         using var contentStream = FileManager.ReadOutputAsStream(response.Content);

@@ -9,14 +9,11 @@ using Blackbird.Applications.SDK.Blueprints;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Filters.Coders;
 using Blackbird.Filters.Constants;
-using Blackbird.Filters.Enums;
-using Blackbird.Filters.Extensions;
 using Blackbird.Filters.Shared;
 using Blackbird.Filters.Transformations;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Net.Mime;
-using System.Xml.Linq;
 
 namespace Apps.Figma.Actions;
 [ActionList("Variables")]
@@ -28,39 +25,25 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         var response = await Client.ExecuteWithErrorHandling<FigmaFileMetaDto>(request);
         if (response.File is null) throw new PluginMisconfigurationException($"Cannot find Figma file with key {key}");
         return response.File;
-    }
-
-    private async Task<Models.Dto.Meta> GetFileVariables(string key)
-    {
-        var request = new RestRequest($"/v1/files/{key}/variables/local", Method.Get);
-        var response = await Client.ExecuteWithErrorHandling<VariablesResponseDto>(request);
-        return response.Meta;
-    }
-
-    private string? GetVariableAsString(Variable variable, Mode mode)
-    {
-        variable.ValuesByMode.TryGetValue(mode.ModeId, out var valueByNode);
-        if (valueByNode is not string && valueByNode is not null) return null;
-        return (string?) valueByNode;
-    }
+    }    
 
     [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
     [Action("Download variables", Description = "Download the variables of a Figma file")]
-    public async Task<FileResponse> DownloadVariables([ActionParameter] FileKeyRequest keyRequest, [ActionParameter] VariableDownloadRequest variableRequest)
+    public async Task<FileResponse> DownloadVariables([ActionParameter] VariableDownloadRequest variableRequest)
     {
-        if (string.IsNullOrEmpty(keyRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
+        if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
         if (string.IsNullOrEmpty(variableRequest.CollectionId)) throw new PluginMisconfigurationException("The collection ID input is null or empty.");
         if (string.IsNullOrEmpty(variableRequest.ModeName)) throw new PluginMisconfigurationException("The mode input is null or empty.");
 
-        var fileInfo = await GetFileInfo(keyRequest.ContentId);
-        var variablesMeta = await GetFileVariables(keyRequest.ContentId);
+        var fileInfo = await GetFileInfo(variableRequest.ContentId);
+        var variablesMeta = await GetFileVariables(variableRequest.ContentId);
 
         if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'");
         var mode = collection.Modes.FirstOrDefault(x => x.Name == variableRequest.ModeName) ?? throw new PluginMisconfigurationException($"Cannot find mode with name '{variableRequest.ModeName}'");
 
         var variables = variablesMeta.Variables.Values
             .Where(x => x.VariableCollectionId == collection.Id && GetVariableAsString(x, mode) is not null)
-            .ToDictionary(x => x.Name, x => GetVariableAsString(x, mode));
+            .ToDictionary(x => x.Name, x => GetVariableAsString(x, mode)!);
         var serialized = JsonConvert.SerializeObject(variables, Formatting.Indented);
         var jsonCoder = new JsonCoder();
 
@@ -71,13 +54,14 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         codedContent.OriginalName = contentName;
         codedContent.SystemReference = new SystemReference
         {
-            ContentId = $"{keyRequest.ContentId}|{collection.Id}",
+            ContentId = $"{variableRequest.ContentId}|{collection.Id}",
             ContentName = $"{fileInfo.Name} - {collection.Name}",
-            AdminUrl = $"https://www.figma.com/design/{keyRequest.ContentId}?view=variables",
+            AdminUrl = $"https://www.figma.com/design/{variableRequest.ContentId}?view=variables",
             SystemName = "Figma",
             SystemRef = "https://www.figma.com"
         };
-        // TODO codedContent.Provenance = 
+        codedContent.Provenance.Review.Tool = "Figma";
+        codedContent.Provenance.Review.ToolReference = "https://www.figma.com";
 
         return new FileResponse
         {
