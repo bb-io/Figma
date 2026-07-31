@@ -62,6 +62,36 @@ Treat the collection as a table of localizable copy: each row is one uniquely na
 
 Figma users can add variables as their designs evolve. When a Bird is configured to download and translate the collection, new variables are included automatically and translated values can be uploaded to the appropriate language mode. The same structure can also support automated workflows that synchronize Figma variables with product translation keys in developer repositories.
 
+> TIP! You can use a plugin like [Text to Strings](https://www.figma.com/community/plugin/1534828125197673702/text-to-strings-create-export-or-import-text-variables?fuid=1182244249574708244) (among others) in order to turn all your visible text into variables.
+
+### Synchronizing with product repositories
+
+The files that Blackbird generates are keyed JSON files (although it's possible to conver these to whatever file structure your developers use). This means that the files can also be synchronized with the many different code repository Apps in Blackbird like Github or Gitlab among others. This opens up the ability for your translation process to conclude in the Figma environment with developers immediatly receiving any updated translations into their environment. Alternatively, monolingual changes can also be synchronized so that users working in Figma can automatically update product strings. 
+
+Blackbird can also synchronize strings in the other direction, taking your product strings as the source of truth and updating them in Figma when changes are made by developers. For more information on these advanced techniques read the [Blacklake documentation](https://docs.blackbird.io/blacklake/introduction/).
+
+## Example Bird
+
+![1785499840090](image/README/1785499840090.png)
+
+This example shows the shape of a Bird triggering on changes to the source language (languages are denoted by modes, columns in the Figma variables table). It then downloads the variables, uses Blacklake to prepare the content for translation (diffing, leveraging, style guides and terminology), translates the files and uploads them back to Figma. The result is a seamless workflow where any source changes automatically update all the other languages in Figma.
+
+As a bonus, the Upload file to Github Action also synchronizes the content to Github so that developers can immediatly use the content and translations.
+
+## Example Workflow
+
+What follows is an example that shows how a Bird like the one above could be used in production and how it neatly automates within your existing workflows.
+
+1. Open a Figma file that is covered by a Bird like the one above.
+2. If not done yet, make sure that all the visible text are connected variables. You can use a plugin like [Text to Strings](https://www.figma.com/community/plugin/1534828125197673702/text-to-strings-create-export-or-import-text-variables?fuid=1182244249574708244) ![1785500190623](image/README/1785500190623.png)
+3. You can view the variables by going to the variables tab. The plugin should have created a lot of variables. Tip: for convenience it's useful to rename the columns to language codes. ![1785500304035](image/README/1785500304035.png)
+4. After your Flight finishes using your preferred translation workflow. The new languages are automatically updated in Figma. ![1785500455039](image/README/1785500455039.png)
+5. Select the frames that you want to change the languages of. In the right bar under *Appearance* you can select the language you want to view your frames in.
+6. The frames automatically change to the selected language. If you want to duplicate the frames simply duplicate them and set a different language per frame. ![1785500572047](image/README/1785500572047.png)
+7. Bonus: the Bird has also updated the strings in Github! ![1785500701911](image/README/1785500701911.png)
+
+As with all Birds in Blackbird, many variations can be made including but not limited to changing the preferred translation methodology, adding project management tools into the Bird for enhanced control, and setting up Blacklake in context editing functionality!
+
 > We are still developing the Figma app and want to hear your opinion. How do you ultimately want to translate content in Figma? What do you do today, and how would you want to see that improved? If you're interested in using the Blackbird Figma app for translation, please reach out.
 
 ## Feedback
