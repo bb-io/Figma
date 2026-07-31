@@ -69,10 +69,18 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         };
     }
 
-    private static string SanitizeCharacters(string input)
+    private static string? SanitizeCharacters(string input)
     {
         if (input == null)
             return input;
+
+        // Unwrap Newtonsoft JSONPath bracket notation: ['property']
+        if (input.Length >= 4 &&
+            input.StartsWith("['", StringComparison.Ordinal) &&
+            input.EndsWith("']", StringComparison.Ordinal))
+        {
+            input = input[2..^2];
+        }
 
         return input
             .Replace('{', '[')
@@ -100,7 +108,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         var fileInfo = await GetFileInfo(variableRequest.ContentId);
         var variablesMeta = await GetFileVariables(variableRequest.ContentId);
 
-        var locale = variableRequest.Locale ?? contentResult.Value.Language;
+        var locale = variableRequest.Locale ?? contentResult.Value.Language ?? "en";
 
         if (!variablesMeta.VariableCollections.TryGetValue(variableRequest.CollectionId, out var collection)) throw new PluginMisconfigurationException($"Cannot find collection with ID '{variableRequest.CollectionId}'"); 
         var mode = collection.Modes.FirstOrDefault(x => x.Name == locale);
