@@ -29,7 +29,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
 
     [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
     [Action("Download variables", Description = "Download variables from a Figma project")]
-    public async Task<FileResponse> DownloadVariables([ActionParameter] VariableDownloadRequest variableRequest)
+    public async Task<DownloadVariablesResponse> DownloadVariables([ActionParameter] VariableDownloadRequest variableRequest)
     {
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
         if (string.IsNullOrEmpty(variableRequest.CollectionId)) throw new PluginMisconfigurationException("The collection ID input is null or empty.");
@@ -63,7 +63,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         codedContent.Provenance.Review.Tool = "Figma";
         codedContent.Provenance.Review.ToolReference = "https://www.figma.com";
 
-        return new FileResponse
+        return new DownloadVariablesResponse
         {
             Content = await fileManagementClient.UploadAsync(jsonCoder.ToStream(codedContent), MediaTypeNames.Application.Json, fileName),
         };

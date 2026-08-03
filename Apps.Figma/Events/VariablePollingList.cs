@@ -82,12 +82,15 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
             });
         }
 
+        var defaultMode = collection.Modes.FirstOrDefault(x => x.ModeId == collection.DefaultModeId)?.Name ?? throw new PluginApplicationException("No default mode ");
+        var otherModes = collection.Modes.Where(x => x.Name != defaultMode).Select(x => x.Name);
+
         return new PollingEventResponse<VariablesPollingMemory, VariablePollingResponse>
         {
             FlyBird = items.Count > 0,
             Memory = new VariablesPollingMemory { VariablesHashByMode = variableHashesByMode },
             Result = items.Count > 0
-                ? new VariablePollingResponse { Items = items }
+                ? new VariablePollingResponse { Items = items, DefaultMode = defaultMode, OtherModes = otherModes }
                 : null
         };
     }
