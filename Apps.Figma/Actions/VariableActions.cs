@@ -63,6 +63,15 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
         codedContent.Provenance.Review.Tool = "Figma";
         codedContent.Provenance.Review.ToolReference = "https://www.figma.com";
 
+        foreach(var unit in codedContent.TextUnits)
+        {
+            var variable = variablesMeta.Variables.Values.FirstOrDefault(x => x.Name == unit.Key);
+            if (variable is not null && !string.IsNullOrWhiteSpace(variable.Description)) 
+            {
+                unit.Context = variable.Description;
+            }
+        }
+
         return new DownloadVariablesResponse
         {
             Content = await fileManagementClient.UploadAsync(jsonCoder.ToStream(codedContent), MediaTypeNames.Application.Json, fileName),
