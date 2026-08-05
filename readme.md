@@ -78,6 +78,12 @@ This example shows the shape of a Bird triggering on changes to the source langu
 
 As a bonus, the Upload file to Github Action also synchronizes the content to Github so that developers can immediatly use the content and translations.
 
+## Demo video
+
+[In this demo](https://www.youtube.com/watch?v=Z8ogMsOw2Ms&list=PLPDUqzx3YYeY&index=1), see how variables work in Figma, how Blackbird.io automates localization workflows and how you could even synchronize Figma with a code repository.
+
+[![Watch the video](https://img.youtube.com/vi/Z8ogMsOw2Ms/0.jpg)](https://www.youtube.com/watch?v=Z8ogMsOw2Ms&list=PLPDUqzx3YYeY&index=1)
+
 ## Example Workflow
 
 What follows is an example that shows how a Bird like the one above could be used in production and how it neatly automates within your existing workflows.
