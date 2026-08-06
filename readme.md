@@ -80,9 +80,9 @@ As a bonus, the Upload file to Github Action also synchronizes the content to Gi
 
 ## Demo video
 
-[In this demo](https://www.youtube.com/watch?v=Z8ogMsOw2Ms&list=PLPDUqzx3YYeY&index=1), see how variables work in Figma, how Blackbird.io automates localization workflows and how you could even synchronize Figma with a code repository.
+[In this demo](https://youtu.be/CeFy62NoFM0?si=aZhskDWKRes0A6gy&index=1), see how variables work in Figma, how Blackbird.io automates localization workflows and how you could even synchronize Figma with a code repository.
 
-[![Watch the video](https://img.youtube.com/vi/Z8ogMsOw2Ms/0.jpg)](https://www.youtube.com/watch?v=Z8ogMsOw2Ms&list=PLPDUqzx3YYeY&index=1)
+[![Watch the video](https://img.youtube.com/vi/CeFy62NoFM0/0.jpg)](https://youtu.be/CeFy62NoFM0?si=aZhskDWKRes0A6gy&index=1)
 
 ## Example Workflow
 
