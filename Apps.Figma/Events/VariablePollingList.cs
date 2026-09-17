@@ -1,6 +1,7 @@
 ﻿using Apps.Figma.Models.Polling;
 using Apps.Figma.Models.Requests;
 using Apps.Figma.Models.Responses;
+using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -30,10 +31,11 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
     }
 
 
-    [BlueprintEventDefinition(BlueprintEvent.ContentCreatedOrUpdatedMultiple)]
+    [BlueprintEventDefinition(BlueprintEvent.ContentCreatedOrUpdated)]
     [PollingEvent("On variables updated",
        Description = "Triggers when variables in a mode are updated.")]
-    public async Task<PollingEventResponse<VariablesPollingMemory, VariablePollingResponse>> OnVariablesUpdated(
+    [MultipleEvents]
+    public async Task<PollingEventResponse<VariablesPollingMemory, List<VariableDownloadRequest>>> OnVariablesUpdated(
        PollingEventRequest<VariablesPollingMemory> request,
        [PollingEventParameter] VariablePollingFilters filter)
     {
@@ -65,7 +67,16 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
                 Result = null
             };
 
+        var defaultMode = collection.Modes.FirstOrDefault(x => x.ModeId == collection.DefaultModeId)?.Name ?? throw new PluginApplicationException("No default mode ");
+
         var modesToConsider = filter.ModeNames ?? collection.Modes.Select(x => x.Name) ?? [];
+        if (filter.DefaultModeHandler is not null && filter.DefaultModeHandler == "default")
+        {
+            modesToConsider = modesToConsider.Where(x => x == defaultMode);
+        } else if (filter.DefaultModeHandler is not null && filter.DefaultModeHandler == "other")
+        {
+            modesToConsider = modesToConsider.Where(x => x != defaultMode);
+        }
         List<VariableDownloadRequest> items = [];
 
         foreach (var modeName in modesToConsider) 
@@ -82,16 +93,13 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
             });
         }
 
-        var defaultMode = collection.Modes.FirstOrDefault(x => x.ModeId == collection.DefaultModeId)?.Name ?? throw new PluginApplicationException("No default mode ");
-        var otherModes = collection.Modes.Where(x => x.Name != defaultMode).Select(x => x.Name);
 
-        return new PollingEventResponse<VariablesPollingMemory, VariablePollingResponse>
+
+        return new PollingEventResponse<VariablesPollingMemory, List<VariableDownloadRequest>>
         {
             FlyBird = items.Count > 0,
             Memory = new VariablesPollingMemory { VariablesHashByMode = variableHashesByMode },
-            Result = items.Count > 0
-                ? new VariablePollingResponse { Items = items, DefaultMode = defaultMode, OtherModes = otherModes }
-                : null
+            Result = items
         };
     }
 }

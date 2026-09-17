@@ -121,6 +121,6 @@ public class PollingEventTests : TestBase
         
         Console.WriteLine(JsonConvert.SerializeObject(result.Result, Formatting.Indented));
 
-        Assert.IsTrue(result.Result.Items.Count == 2);
+        Assert.IsTrue(result.Result.Count == 2);
     }
 }
