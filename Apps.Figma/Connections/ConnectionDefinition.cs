@@ -14,7 +14,7 @@ public class ConnectionDefinition : IConnectionDefinition
             AuthenticationType = ConnectionAuthenticationType.Undefined,
             ConnectionProperties = new List<ConnectionProperty>
             {
-                new(CredsNames.ProjectId) { DisplayName = "Project ID", Sensitive = false},
+                new(CredsNames.FolderId) { DisplayName = "Folder ID", Sensitive = false},
                 new(CredsNames.Token) { DisplayName = "Personal Access Token", Sensitive = true}
             }
         }

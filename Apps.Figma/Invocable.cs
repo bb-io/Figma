@@ -14,13 +14,13 @@ public class Invocable : BaseInvocable
     protected AuthenticationCredentialsProvider[] Creds =>
         InvocationContext.AuthenticationCredentialsProviders.ToArray();
 
-    protected string ProjectId { get; set; }
+    protected string FolderId { get; set; }
 
     protected Client Client { get; }
     public Invocable(InvocationContext invocationContext) : base(invocationContext)
     {
         Client = new(Creds);
-        ProjectId = Creds.Get(CredsNames.ProjectId).Value;
+        FolderId = Creds.Get(CredsNames.FolderId).Value;
     }
 
     protected async Task<Meta> GetFileVariables(string key)
