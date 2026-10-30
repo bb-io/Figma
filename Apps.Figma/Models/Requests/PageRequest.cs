@@ -6,6 +6,6 @@ namespace Apps.Figma.Models.Requests;
 
 public class PageRequest
 {
-    [Display("Page"), DataSource(typeof(PageHandler))]
+    [Display("Page ID"), DataSource(typeof(PageHandler))]
     public string? PageId { get; set; }
 }

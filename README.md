@@ -18,7 +18,7 @@ Before you can connect, make sure that:
 
 - You have a Figma account.
 - You have a Personal Access Token for your Figma account. You can find it under **Account settings** > **Security** > **Personal access tokens**. Make sure your access token has the following scopes: *folders:read, file_content:read, file_metadata:read, file_variables:read, file_variables:write*
-- You have an existing Figma project you want to connect to.
+- You have access to the Figma folder you want to connect to.
 
 > Connecting to Figma with OAuth will be available soon.
 
