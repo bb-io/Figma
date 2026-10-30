@@ -43,6 +43,9 @@ Before you can connect, make sure that:
 
 - **Download image** Download an image from a file.
   - **Format**: The image format to download. If omitted, PNG is used.
+- **Download images from frames** Download images of top-level frames in a file. The returned image URLs expire after 30 days.
+  - **Page**: Limit the export to one page. If omitted, frames from all pages are included.
+  - **Format**: The image format to download. If omitted, PNG is used.
 
 ## Events
 
