@@ -9,7 +9,7 @@ public class FileKeyHandler(InvocationContext invocationContext)
 {
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken ct)
     {
-        var request = new RestRequest($"/v1/projects/{ProjectId}/files", Method.Get);
+        var request = new RestRequest($"/v2/folders/{FolderId}/files", Method.Get);
         var response = await Client.ExecuteWithErrorHandling<FigmaFilesDto>(request);
 
 

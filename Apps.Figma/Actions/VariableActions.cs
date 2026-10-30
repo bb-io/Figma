@@ -1,4 +1,4 @@
-﻿using Apps.Figma.Models.Dto;
+using Apps.Figma.Models.Dto;
 using Apps.Figma.Models.Requests;
 using Apps.Figma.Models.Responses;
 using Blackbird.Applications.Sdk.Common;
@@ -28,7 +28,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
     }    
 
     [BlueprintActionDefinition(BlueprintAction.DownloadContent)]
-    [Action("Download variables", Description = "Download variables from a Figma project")]
+    [Action("Download variables", Description = "Download variables from a file")]
     public async Task<DownloadVariablesResponse> DownloadVariables([ActionParameter] VariableDownloadRequest variableRequest)
     {
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");
@@ -99,7 +99,7 @@ public class VariableActions(InvocationContext invocationContext, IFileManagemen
     }
 
     [BlueprintActionDefinition(BlueprintAction.UploadContent)]
-    [Action("Upload variables", Description = "Upload translated variables to a Figma project")]
+    [Action("Upload variables", Description = "Upload translated variables to a file")]
     public async Task<UploadVariablesResponse> UploadVariables([ActionParameter] VariableUploadRequest variableRequest)
     {
         if (string.IsNullOrEmpty(variableRequest.ContentId)) throw new PluginMisconfigurationException("The key input is null or empty.");

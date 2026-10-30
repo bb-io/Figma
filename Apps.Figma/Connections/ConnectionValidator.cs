@@ -18,9 +18,9 @@ public class ConnectionValidator(InvocationContext invocationContext) : BaseInvo
     {
         try
         {
-            var projectId = authenticationCredentialsProviders.Get(CredsNames.ProjectId).Value;
+            var folderId = authenticationCredentialsProviders.Get(CredsNames.FolderId).Value;
             var client = new Client(authenticationCredentialsProviders);
-            var request = new RestRequest($"/v1/projects/{projectId}/files");
+            var request = new RestRequest($"/v2/folders/{folderId}/files");
 
             var response = await client.ExecuteAsync(request, cancellationToken);
             var isValid = 
