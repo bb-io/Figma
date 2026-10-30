@@ -33,6 +33,11 @@ Before you can connect, make sure that:
 
 ## Actions
 
+### Pages
+
+- **Search pages in a file** Get page IDs and names from a file.
+  - **Page name contains**: Limit results to pages whose names contain this text, ignoring case. If omitted, all pages are returned.
+
 ### Variables
 
 - **Download variables** Download variables from a file.
