@@ -6,15 +6,16 @@
         <Nullable>enable</Nullable>
         <Product>Figma</Product>
         <Description>Design and collaboration platform that specializes in UI and UX design</Description>
-        <Version>1.0.12</Version>
+        <Version>1.0.13</Version>
         <AssemblyName>Apps.Figma</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.2" />
-        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.16.0" />
+        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.17.0" />
+        <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.1.0" />
         <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.1.0-rc.8709" />
-        <PackageReference Include="Blackbird.Filters" Version="1.2.18" />
+        <PackageReference Include="Blackbird.Filters" Version="1.3.5" />
     </ItemGroup>
 
     <ItemGroup>
