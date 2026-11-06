@@ -1,4 +1,4 @@
-﻿using Apps.Figma.Events;
+using Apps.Figma.Events;
 using Apps.Figma.Models.Polling;
 using Blackbird.Applications.Sdk.Common.Polling;
 using Newtonsoft.Json;
@@ -101,7 +101,7 @@ public class PollingEventTests : TestBase
             VariablesHashByMode = new Dictionary<string, string>
             {
                   { "en-us", "A92F43257B8168979D94F6632494D547694CA3831A906B2747BC7B5223BE2663" },
-                  { "uk-ua", "211155AD7D09B81C435C8815FB133EC7E408A8CEE3845AF574DEB2D91424A666" },
+                  { "uk", "211155AD7D09B81C435C8815FB133EC7E408A8CEE3845AF574DEB2D91424A666" },
                   { "nl-nl", "90B7AC973EDE3EB7CC001D05E43A15D6854C24BDC3889387C80BE533CCCA95B1" },
                   { "de-de", "4E24FC788F509AC2BBE38B65E02CF90DF330A13AE7F6478D7962216672D2EBBA" },
                   { "nl-be", "E7B1D5AF164410560995E24743A74C35DBC691BB263F238CFC38D2BF569EF53A" }
@@ -112,7 +112,7 @@ public class PollingEventTests : TestBase
         {
             Memory = memory,
         };
-        var result = await PollingEvents.OnVariablesUpdated(request, new VariablePollingFilters() { CollectionId = collectionId, ContentId = key, ModeNames = ["en-us", "uk-ua"] });
+        var result = await PollingEvents.OnVariablesUpdated(request, new VariablePollingFilters() { CollectionId = collectionId, ContentId = key, ModeNames = ["en-us", "uk"] });
 
         Assert.IsTrue(result.FlyBird, "The Bird did not fly");
         Assert.IsNotNull(result.Result);
@@ -122,5 +122,15 @@ public class PollingEventTests : TestBase
         Console.WriteLine(JsonConvert.SerializeObject(result.Result, Formatting.Indented));
 
         Assert.IsTrue(result.Result.Count == 2);
+        var first = result.Result[0];
+        Assert.IsFalse(string.IsNullOrEmpty(first.DefaultMode));
+        Assert.IsFalse(first.OtherModes.Contains(first.DefaultMode));
+        foreach (var item in result.Result)
+        {
+            Assert.AreEqual(first.DefaultMode, item.DefaultMode);
+            CollectionAssert.AreEqual(first.OtherModes.ToList(), item.OtherModes.ToList());
+            Assert.AreEqual(key, item.ContentId);
+            Assert.AreEqual(collectionId, item.CollectionId);
+        }
     }
 }
