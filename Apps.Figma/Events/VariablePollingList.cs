@@ -35,7 +35,7 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
     [PollingEvent("On variable updated",
        Description = "Triggers when a variable in a mode is updated.")]
     [MultipleEvents]
-    public async Task<PollingEventResponse<VariablesPollingMemory, List<VariableDownloadRequest>>> OnVariablesUpdated(
+    public async Task<PollingEventResponse<VariablesPollingMemory, List<VariableUpdatedResponse>>> OnVariablesUpdated(
        PollingEventRequest<VariablesPollingMemory> request,
        [PollingEventParameter] VariablePollingFilters filter)
     {
@@ -77,7 +77,8 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
         {
             modesToConsider = modesToConsider.Where(x => x != defaultMode);
         }
-        List<VariableDownloadRequest> items = [];
+        var otherModes = collection.Modes.Where(x => x.Name != defaultMode).Select(x => x.Name).ToList();
+        List<VariableUpdatedResponse> items = [];
 
         foreach (var modeName in modesToConsider) 
         {
@@ -85,17 +86,19 @@ public class VariablePollingList(InvocationContext invocationContext) : Invocabl
             if (!request.Memory.VariablesHashByMode.TryGetValue(modeName, out var memoryVariableHash)) continue;
             if (currentVariableHash == memoryVariableHash) continue;
 
-            items.Add(new VariableDownloadRequest
+            items.Add(new VariableUpdatedResponse
             {
                 CollectionId = filter.CollectionId,
                 ContentId = filter.ContentId,
                 ModeName = modeName,
+                DefaultMode = defaultMode,
+                OtherModes = otherModes,
             });
         }
 
 
 
-        return new PollingEventResponse<VariablesPollingMemory, List<VariableDownloadRequest>>
+        return new PollingEventResponse<VariablesPollingMemory, List<VariableUpdatedResponse>>
         {
             FlyBird = items.Count > 0,
             Memory = new VariablesPollingMemory { VariablesHashByMode = variableHashesByMode },
